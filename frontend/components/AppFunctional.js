@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-   // Utility function: Validate email format
-const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    // Utility function: Validate email format
+  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-// Suggested initial states
-const initialMessage = ''
-const initialEmail = ''
-const initialSteps = 0
-const initialIndex = 4 // the index the "B" is at
+  // Suggested initial states
+  const initialMessage = ''
+  const initialEmail = ''
+  const initialSteps = 0
+  const initialIndex = 4 // the index the "B" is at
 
 
 export default function AppFunctional(props) {
@@ -23,7 +23,7 @@ export default function AppFunctional(props) {
   const gridSize = 3; //3*3 gid.
 
        //helper: gets cordinate based on index.
-  function getXY() { 
+function getXY() { 
     // It it not necessary to have a state to track the coordinates.
     // It's enough to know what index the "B" is at, to be able to calculate them.
     const x = (index % gridSize) + 1;
@@ -32,7 +32,7 @@ export default function AppFunctional(props) {
   }
 
       // Helper: Generate coordinates message 
-  function getXYMessage()  {
+function getXYMessage()  {
     // It it not necessary to have a state to track the "Coordinates (2, 2)" message for the user.
     // You can use the `getXY` helper above to obtain the coordinates, and then `getXYMessage`
     // returns the fully constructed string.
@@ -41,7 +41,7 @@ export default function AppFunctional(props) {
   }
 
      // Helper: Reset all states to initial values
-  function reset() {
+function reset() {
     // Use this helper to reset all states to their initial values.
     setMessage(initialMessage);
     setEmail(initialEmail);
@@ -49,7 +49,7 @@ export default function AppFunctional(props) {
     setIndex(initialIndex);
   }
       // Helper: Calculate the next index based on direction
-  function getNextIndex(direction) {
+function getNextIndex(direction) {
     // This helper takes a direction ("left", "up", etc) and calculates what the next index
     // of the "B" would be. If the move is impossible because we are at the edge of the grid,
     // this helper should return the current index unchanged.
@@ -71,7 +71,7 @@ export default function AppFunctional(props) {
   }
 
     // Event handler: Move the "B"
-  function move(evt) {
+function move(evt) {
     // This event handler can use the helper above to obtain a new index for the "B",
     // and change any states accordingly.
     const direction = evt.target.id;
@@ -87,13 +87,13 @@ export default function AppFunctional(props) {
   }
 
      // Event handler: Update the email value
-  function onChange(evt) {
+function onChange(evt) {
     // You will need this to update the value of the input.
     setEmail(evt.target.value);
   }
 
     // Event handler: Handle form submission
-  async function onSubmit(evt) {
+async function onSubmit(evt) {
     // Use a POST request to send a payload to the server.
     evt.preventDefault();
     
@@ -121,9 +121,11 @@ export default function AppFunctional(props) {
     try {
       const res = await axios.post('http://localhost:9000/api/result', payload);
       setMessage(res.data.message); // Assuming the server response includes a success message
+      console.log(res.data.message);
       setEmail(''); // Reset email
     } catch (err) {
       setMessage(err.response?.data?.message || 'An error occurred'); // Display server error or generic error
+
     }
 }
 
@@ -160,7 +162,7 @@ export default function AppFunctional(props) {
          value={email} 
          onChange={onChange}
          />
-        <input id="submit" type="submit"/>
+        <input id="submit" type="submit" value="submit"/>
       </form>
     </div>
   )

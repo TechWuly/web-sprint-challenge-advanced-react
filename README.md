@@ -6,7 +6,7 @@ In this challenge, you will write the logic for [THIS WIDGET](https://advanced-r
 
 Study its functionality and also inspect the Console, the Network tab and the Elements tab **in Chrome Dev Tools**:
 
-- There are two versions of the widget with identical functionality: class-based and functional.
+- There are two versions of the widget with identical functionality: class-based andfunctional.
 - The input box at the bottom of the page expects a valid email address.
 - Email validation errors arrive from the server, as you can see in the Network tab, under "Preview".
 - The payload sent to the server on form submit can also be seen in the Network tab, under "Payload".
