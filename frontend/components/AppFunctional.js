@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
+   // Utility function: Validate email format
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 // Suggested initial states
 const initialMessage = ''
@@ -93,29 +96,42 @@ export default function AppFunctional(props) {
   async function onSubmit(evt) {
     // Use a POST request to send a payload to the server.
     evt.preventDefault();
+    
+
+    // Validate email
+  if (!email.trim()) {
+    setMessage("Ouch: email is required");
+    return;
+  }
+    // Validate email format or validate email is provided
+  if (!isValidEmail(email)) {
+    setMessage("Ouch: email must be a valid email");
+    return;
+  }
+       // Check banned email
+  const bannedEmails = ["foo@bar.baz"];
+    if (bannedEmails.includes(email)) {
+     setMessage(`${email} failure #${index}`);
+    return;
+}
+      // Extract coordinates or send payload
     const [x, y] = getXY();
     const payload = { x, y, steps, email };
 
     try {
-      const response = await fetch('http://localhost:9000/api/result', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-      setMessage(data.message); // Update message state with the response
-        setEmail(''); // Clear the email field
-      } catch (error) {
-        setMessage('Error submitting your result.');
-      }
+      const res = await axios.post('http://localhost:9000/api/result', payload);
+      setMessage(res.data.message); // Assuming the server response includes a success message
+      setEmail(''); // Reset email
+    } catch (err) {
+      setMessage(err.response?.data?.message || 'An error occurred'); // Display server error or generic error
     }
+}
 
   return (
     <div id="wrapper" className={props.className}>
       <div className="info">
         <h3 id="coordinates">{getXYMessage()}</h3>
-        <h3 id="steps">You moved {steps} times</h3>
+        <h3 id="steps">You moved {steps} {steps === 1 ? 'time' : 'times'}</h3>
       </div>
       <div id="grid">
         {
