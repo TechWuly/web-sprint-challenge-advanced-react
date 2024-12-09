@@ -90,6 +90,7 @@ function move(evt) {
 function onChange(evt) {
     // You will need this to update the value of the input.
     setEmail(evt.target.value);
+    console.log("Email reset to:", email); // This will log the current email state
   }
 
     // Event handler: Handle form submission

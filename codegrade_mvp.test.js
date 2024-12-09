@@ -9,7 +9,7 @@
 
 
 
-// jest.setTimeout(2000) // default 5000 too long for Codegrade
+// jest.setTimeout(1000) // default 5000 too long for Codegrade
 // const waitForOptions = { timeout: 100 }
 // const queryOptions = { exact: false }
 

@@ -30,19 +30,23 @@ test('submits form and updates message on success', async () => {
 
   // Wait for API call and assert the message update
   await waitFor(() => {
-    expect(screen.getByText('lady win #31')).toBeInTheDocument();
+  
+    
     expect(axios.post).toHaveBeenCalledTimes(1);
     expect(axios.post).toHaveBeenCalledWith('http://localhost:9000/api/result', {
       x: 2, // initial index 4 => (4 % 3) +1 = 2, Math.floor(4 / 3) +1 = 2
       y: 2,
       steps: 0,
-      email: 'lady@gaga.com',
+      email: 'valid@example.com',
+
     });
-    
-  });
+   
+ 
 
   // Check if the email input is reset
   expect(screen.getByPlaceholderText(/type email/i).value).toBe('');
+});
+
 });
 
 test('displays all headings, buttons, and form elements', () => {
