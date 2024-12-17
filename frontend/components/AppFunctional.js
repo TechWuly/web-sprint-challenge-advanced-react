@@ -126,7 +126,7 @@ async function onSubmit(evt) {
       setEmail(''); // Reset email
     } catch (err) {
       setMessage(err.response?.data?.message || 'An error occurred'); // Display server error or generic error
-
+      
     }
 }
 
@@ -146,7 +146,7 @@ async function onSubmit(evt) {
         }
       </div>
       <div className="info">
-        <h3 id="message">{message}</h3> {/* Render the message here */}
+        <h3 id="message" className={message.includes("failure") ? "error" : "success"}>{message}</h3> {/* Render the message here */}
       </div>
       <div id="keypad">
         <button id="left" onClick={move}>LEFT</button>
