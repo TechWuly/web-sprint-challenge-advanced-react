@@ -156,6 +156,7 @@ async function onSubmit(evt) {
         <button id="reset" onClick={reset}>reset</button>
       </div>
       <form onSubmit={onSubmit}>
+      <label htmlFor="email">Email</label>
         <input 
          id="email"
          type="email"

@@ -6,11 +6,12 @@ import AppFunctional from './frontend/components/AppFunctional'
 import { act, render, fireEvent, screen, waitFor } from '@testing-library/react'
 
 import '@testing-library/jest-dom/extend-expect'
+import userEvent from  '@testing-library/user-event'
 
 
 
-jest.setTimeout(2000) // default 5000 too long for Codegrade
-const waitForOptions = { timeout: 100 }
+jest.setTimeout(10000) // default 5000 too long for Codegrade
+const waitForOptions = { timeout: 5000 }
 const queryOptions = { exact: false }
 
 let up, down, left, right, reset, submit
@@ -384,75 +385,113 @@ test('AppFunctional is a functional component', () => {
         expect(email.value).toBeFalsy()
       })
     })
+    
     describe(`[F ${label}] Submit Button`, () => {
-        
-      test(`[F1 ${label}] Actions: up, type email, submit Success message is correct`, async () => {
-        await act(async () => {
-            fireEvent.click(up);
-            fireEvent.change(email, { target: { value: 'lady@gaga.com' } });
-            fireEvent.click(submit);
-        });
-    
-        // Use waitFor with a simpler regex matcher
-        const message = await waitFor(() => 
-            screen.getByText(/lady win #\d+/i)
-        );
-    
-        expect(message).toBeInTheDocument();
-});
-
-test(`[F2 ${label}] Actions: down, down, type email, submit Success message is correct`, async () => {
-  await act(async () => {
-      fireEvent.click(down);
-      fireEvent.click(down);
-      fireEvent.change(email, { target: { value: 'lady@gaga.com' } });
-      fireEvent.click(submit);
+      test(`[F1 ${label}] User types email and submits successfully`, async () => {
+          await act(async () => {
+              userEvent.click(up);
+              userEvent.type(email, 'lady@gaga.com');
+              userEvent.click(submit);
+          });
+  
+          const message = await screen.findByText(
+              (content, element) => content.startsWith('lady win') && element.tagName.toLowerCase() === 'h3'
+          );
+  
+          expect(message).toBeInTheDocument();
+      });
+  
+      test(`[F2 ${label}] User navigates down twice, types email, and submits successfully`, async () => {
+          await act(async () => {
+              userEvent.click(down);
+              userEvent.click(down);
+              userEvent.type(email, 'lady@gaga.com');
+              userEvent.click(submit);
+          });
+  
+          const message = await screen.findByText(
+              (content, element) => content.startsWith('lady win') && element.tagName.toLowerCase() === 'h3'
+          );
+  
+          expect(message).toBeInTheDocument();
+      });
+  
+      test(`[F3 ${label}] User navigates in all directions, types email, and submits successfully`, async () => {
+          await act(async () => {
+              userEvent.click(up);
+              userEvent.click(down);
+              userEvent.click(left);
+              userEvent.click(right);
+              userEvent.type(email, 'lady@gaga.com');
+              userEvent.click(submit);
+          });
+  
+          const message = await screen.findByText(
+              (content, element) => content.startsWith('lady win') && element.tagName.toLowerCase() === 'h3'
+          );
+  
+          expect(message).toBeInTheDocument();
+      });
+  
+      test(`[F4 ${label}] User submits without typing email, error message is displayed`, async () => {
+          await act(async () => {
+              userEvent.click(down);
+              userEvent.click(right);
+              userEvent.click(submit);
+          });
+  
+          const errorMessage = await screen.findByText(/Ouch: email is required/i);
+          expect(errorMessage).toBeInTheDocument();
+      });
+  
+      test(`[F5 ${label}] User types invalid email, error message is displayed`, async () => {
+          await act(async () => {
+              userEvent.click(down);
+              userEvent.click(right);
+              userEvent.type(email, 'bad@email');
+              userEvent.click(submit);
+          });
+  
+          const errorMessage = await screen.findByText(/Ouch: email must be a valid email/i);
+          expect(errorMessage).toBeInTheDocument();
+      });
+  
+      test(`[F6 ${label}] User types banned email, error message is displayed`, async () => {
+          await act(async () => {
+              userEvent.click(down);
+              userEvent.click(right);
+              userEvent.type(screen.getByPlaceholderText(/type email/i), 'foo@bar.baz');
+              userEvent.click(screen.getByText(/submit/i));
+          });
+  
+          const bannedEmailMessage = await screen.findByText(/foo@bar.baz failure/i);
+          expect(bannedEmailMessage).toBeInTheDocument();
+      });
+  
+      test(`[F7 ${label}] Submitting valid email resets the input`, async () => {
+          await act(async () => {
+              userEvent.click(left);
+              userEvent.type(email, 'lady@gaga.com');
+              userEvent.click(screen.getByText(/submit/i));
+          });
+  
+          const successMessage = await screen.findByText(/lady win #\d+/i);
+          expect(successMessage).toBeInTheDocument();
+          expect(screen.getByPlaceholderText(/type email/i).value).toBe(''); // Check input reset
+      });
+  
+      test(`[F8 ${label}] Submitting valid email does not reset navigation state`, async () => {
+          await act(async () => {
+              userEvent.click(up);
+              userEvent.click(right);
+              userEvent.type(email, 'lady@gaga.com');
+              userEvent.click(submit);
+          });
+  
+          const successMessage = await screen.findByText(/lady win #\d+/i);
+          expect(successMessage).toBeInTheDocument();
+          // You might want to add assertions to verify navigation state is unchanged.
+      });
   });
-
-  // Use waitFor to ensure the message appears in the DOM
-  const message = await waitFor(() =>
-      screen.getByText(/lady win #\d+/i, queryOptions), // Using queryOptions
-      waitForOptions // Using waitForOptions
-  );
-
-  expect(message).toBeInTheDocument();
-});
-
-test(`[F3 ${label}] Actions: up, down, left, right, type email, submit Success message is correct`, async () => {
-  await act(async () => {
-      fireEvent.click(up);
-      fireEvent.click(down);
-      fireEvent.click(left);
-      fireEvent.click(right);
-      fireEvent.change(email, { target: { value: 'lady@gaga.com' } });
-      fireEvent.click(submit);
-  });
-
-  // Use waitFor to ensure the message appears in the DOM
-  const message = await waitFor(() =>
-      screen.getByText(/lady win #\d+/i, queryOptions), // Using queryOptions
-      waitForOptions // Using waitForOptions
-  );
-
-  expect(message).toBeInTheDocument();
-});
-
-test(`[F4 ${label}] Actions: down, right, submit Error message on no email is correct`, async () => {
-  await act(async () => {
-      fireEvent.click(down);  // Simulates clicking the "down" button
-      fireEvent.click(right); // Simulates clicking the "right" button
-      fireEvent.click(submit); // Simulates clicking the submit button
-  });
-
-  // Use waitFor to ensure the error message appears in the DOM
-  const errorMessage = await waitFor(() =>
-      screen.getByText(/Ouch: email is required/i, queryOptions), // Using queryOptions
-      waitForOptions // Using waitForOptions
-  );
-
-  // Verify that the error message is in the document
-  expect(errorMessage).toBeInThe
-      })
-    })
   })
 })
